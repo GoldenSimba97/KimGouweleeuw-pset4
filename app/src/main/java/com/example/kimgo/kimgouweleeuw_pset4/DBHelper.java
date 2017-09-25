@@ -33,8 +33,9 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_DB = "CREATE TABLE " + TABLE + "("
-                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_TITLE
-                + " TEXT NOT NULL," + KEY_COMPLETED + "TEXT NOT NULL)";
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + KEY_TITLE + " TEXT NOT NULL, "
+                + KEY_COMPLETED + " TEXT NOT NULL);";
         db.execSQL(CREATE_DB);
         Log.d("hello", "hello");
     }
@@ -54,7 +55,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void create(Contact toDo) {
         SQLiteDatabase db = getWritableDatabase();
-//        onUpgrade(db, 1, 2);
+//        onUpgrade(db, 2, 3);
         ContentValues values = new ContentValues();
         values.put(KEY_TITLE, toDo.getTitle());
         values.put(KEY_COMPLETED, toDo.getCompleted());
