@@ -1,11 +1,14 @@
 package com.example.kimgo.kimgouweleeuw_pset4;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -20,11 +23,14 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Contact> todoList;
     ListView lvItems;
     EditText newTodo;
+    MainActivity mainAct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mainAct = this;
 
         newTodo = (EditText) findViewById(R.id.editTodo);
         newTodo.setHint("Add new to-do");
@@ -51,6 +57,23 @@ public class MainActivity extends AppCompatActivity {
 //        lvItems = (ListView) findViewById(R.id.listViewID);
         assert lvItems != null;
         lvItems.setAdapter(todoAdapter);
+
+        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                TodoAdapter todoAdapter = new TodoAdapter(mainAct, todoList);
+                Contact toDo = todoAdapter.getItem(position);
+                view.setBackgroundColor(Color.parseColor("#00C853"));
+                toDo.setCompleted();
+                helper.update(toDo);
+//                String toDo = ((TextView) view).getText().toString();
+
+//                Intent intent = new Intent(view.getContext(), DeleteActivity.class);
+//                intent.putExtra("delete", track);
+//                startActivity(intent);
+//                finish();
+            }
+        });
 
 //        makeTodoAdapter();
 
@@ -81,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             // Get the data item for this position
-            Contact title = getItem(position);
+            Contact toDo = getItem(position);
             // Check if an existing view is being reused, otherwise inflate the view
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_todo, parent, false);
@@ -89,7 +112,10 @@ public class MainActivity extends AppCompatActivity {
             // Lookup view for data population
             TextView tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
             // Populate the data into the template view using the data object
-            tvTitle.setText(title.title);
+            tvTitle.setText(toDo.title);
+            if (toDo.getCompleted() == 1) {
+                convertView.setBackgroundColor(Color.parseColor("#00C853"));
+            }
             // Return the completed view to render on screen
             return convertView;
         }
