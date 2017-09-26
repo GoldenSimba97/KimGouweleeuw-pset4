@@ -53,10 +53,12 @@ public class MainActivity extends AppCompatActivity {
 
         lvItems = (ListView) findViewById(R.id.listViewID);
 
-        TodoAdapter todoAdapter = new TodoAdapter(this, todoList);
-//        lvItems = (ListView) findViewById(R.id.listViewID);
-        assert lvItems != null;
-        lvItems.setAdapter(todoAdapter);
+        findViewById(R.id.addTodo).setOnClickListener(new addToDo());
+
+//        TodoAdapter todoAdapter = new TodoAdapter(this, todoList);
+////        lvItems = (ListView) findViewById(R.id.listViewID);
+//        assert lvItems != null;
+//        lvItems.setAdapter(todoAdapter);
 
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
@@ -75,7 +77,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        makeTodoAdapter();
+        lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                TodoAdapter todoAdapter = new TodoAdapter(mainAct, todoList);
+                Contact toDo = todoAdapter.getItem(position);
+                helper.delete(toDo);
+                todoList = helper.read();
+                makeTodoAdapter();
+                return true;
+            }
+        });
+
+        makeTodoAdapter();
 
 
 
@@ -94,6 +108,19 @@ public class MainActivity extends AppCompatActivity {
 //
 //        // Ask for a list of all contacts
 //        contactList = helper.read();
+    }
+
+    private class addToDo implements View.OnClickListener {
+        @Override public void onClick(View view) {
+            String addTodo = newTodo.getText().toString();
+            if (!addTodo.isEmpty()) {
+                toDo = new Contact(addTodo);
+                helper.create(toDo);
+                newTodo.getText().clear();
+                todoList = helper.read();
+                makeTodoAdapter();
+            }
+        }
     }
 
     public class TodoAdapter extends ArrayAdapter<Contact> {
@@ -121,16 +148,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    public void makeTodoAdapter() {
+    public void makeTodoAdapter() {
 //        ArrayAdapter arrayAdapter = new ArrayAdapter<>
 //                (this, android.R.layout.simple_list_item_1, todoList);
 //        lvItems = (ListView) findViewById(R.id.listViewID);
 //        assert lvItems != null;
 //        lvItems.setAdapter(arrayAdapter);
-//        TodoAdapter todoAdapter = new TodoAdapter(this, todoList);
-//        lvItems = (ListView) findViewById(R.id.listViewID);
-//        assert lvItems != null;
-//        lvItems.setAdapter(todoAdapter);
-//    }
+        TodoAdapter todoAdapter = new TodoAdapter(this, todoList);
+        lvItems = (ListView) findViewById(R.id.listViewID);
+        assert lvItems != null;
+        lvItems.setAdapter(todoAdapter);
+    }
 
 }
