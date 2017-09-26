@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 
 public class Contact implements Serializable {
-    private String title;
+    public String title;
     private int completed;
     private int _id;
 
