@@ -54,34 +54,40 @@ public class MainActivity extends AppCompatActivity {
         lvItems = (ListView) findViewById(R.id.listViewID);
 
         findViewById(R.id.addTodo).setOnClickListener(new addToDo());
-
-        // Set to-do to done and color it green if clicked
-        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                TodoAdapter todoAdapter = new TodoAdapter(mainAct, todoList);
-                Contact toDo = todoAdapter.getItem(position);
-                view.setBackgroundColor(Color.parseColor("#00C853"));
-                assert toDo != null;
-                toDo.setCompleted();
-                helper.update(toDo);
-            }
-        });
-
-        // Delete to-do if it is long clicked
-        lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                TodoAdapter todoAdapter = new TodoAdapter(mainAct, todoList);
-                Contact toDo = todoAdapter.getItem(position);
-                helper.delete(toDo);
-                todoList = helper.read();
-                makeTodoAdapter();
-                return true;
-            }
-        });
+        lvItems.setOnItemClickListener(new setDone());
+        lvItems.setOnItemLongClickListener(new deleteTodo());
 
         makeTodoAdapter();
+    }
+
+
+    // Set to-do to done and color it green if clicked
+    private class setDone implements AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view,
+                                int position, long id) {
+            TodoAdapter todoAdapter = new TodoAdapter(mainAct, todoList);
+            Contact toDo = todoAdapter.getItem(position);
+            view.setBackgroundColor(Color.parseColor("#00C853"));
+            assert toDo != null;
+            toDo.setCompleted();
+            helper.update(toDo);
+        }
+    }
+
+    
+    // Delete to-do if it is long clicked
+    private class deleteTodo implements AdapterView.OnItemLongClickListener {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+            TodoAdapter todoAdapter = new TodoAdapter(mainAct, todoList);
+            Contact toDo = todoAdapter.getItem(position);
+            helper.delete(toDo);
+            todoList = helper.read();
+            makeTodoAdapter();
+            return true;
+        }
     }
 
 
@@ -89,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
     private class addToDo implements View.OnClickListener {
         @Override public void onClick(View view) {
             String addTodo = newTodo.getText().toString();
-            addTodo = addTodo.substring(0, 1).toUpperCase() + addTodo.substring(1);
             if (!addTodo.isEmpty()) {
+                addTodo = addTodo.substring(0, 1).toUpperCase() + addTodo.substring(1);
                 toDo = new Contact(addTodo);
                 helper.create(toDo);
                 newTodo.getText().clear();
