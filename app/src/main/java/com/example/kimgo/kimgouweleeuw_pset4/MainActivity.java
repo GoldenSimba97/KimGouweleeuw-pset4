@@ -1,9 +1,11 @@
 package com.example.kimgo.kimgouweleeuw_pset4;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -40,16 +42,20 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         helper = new DBHelper(context);
 
-        Contact newTodo = new Contact("Add a new to-do by typing your to-do and clicking the ADD-TO-DO button");
-        helper.create(newTodo);
-
-        Contact done = new Contact("Click on your to-do to mark it as done and it will become green", 1);
-        helper.create(done);
-
-        Contact delete = new Contact("Click and hold your to-do to delete it");
-        helper.create(delete);
-
         todoList = helper.read();
+
+        if (todoList.isEmpty()) {
+            Contact newTodo = new Contact("Add a new to-do by typing your to-do and clicking the ADD-TO-DO button");
+            helper.create(newTodo);
+
+            Contact done = new Contact("Click on your to-do to mark it as done and it will become green", 1);
+            helper.create(done);
+
+            Contact delete = new Contact("Click and hold your to-do to delete it");
+            helper.create(delete);
+
+            todoList = helper.read();
+        }
 
         lvItems = (ListView) findViewById(R.id.listViewID);
 
@@ -75,17 +81,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    
+
     // Delete to-do if it is long clicked
     private class deleteTodo implements AdapterView.OnItemLongClickListener {
+        Contact toDo;
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view,
                                     int position, long id) {
             TodoAdapter todoAdapter = new TodoAdapter(mainAct, todoList);
-            Contact toDo = todoAdapter.getItem(position);
-            helper.delete(toDo);
-            todoList = helper.read();
-            makeTodoAdapter();
+            toDo = todoAdapter.getItem(position);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mainAct);
+            builder.setCancelable(true);
+            builder.setMessage("Are you sure you want to delete this to-do?");
+            builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    helper.delete(toDo);
+                    todoList = helper.read();
+                    makeTodoAdapter();
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    makeTodoAdapter();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
             return true;
         }
     }
